@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Key, Sparkles, Wand2, ShieldCheck, AlertCircle } from 'lucide-react';
-import { playSound } from '../../constants';
+import { playSound } from '../../constants.tsx';
 
 interface ActivationModalProps {
   onActivate: () => void;
@@ -21,21 +21,19 @@ const ActivationModal: React.FC<ActivationModalProps> = ({ onActivate }) => {
     setError(null);
     
     try {
-      // Fetch the activation codes file
-      const response = await fetch('./codes.txt');
+      // Use cache busting to ensure we get the latest codes.txt
+      const response = await fetch(`./codes.txt?t=${Date.now()}`);
       if (!response.ok) {
-        throw new Error('无法连接到激活码验证服务，请稍后再试。');
+        throw new Error('无法连接到激活码验证服务，请确认 codes.txt 文件已上传。');
       }
       
       const text = await response.text();
-      // Parse codes: split by line, trim, filter empty lines
       const validCodes = text.split('\n')
         .map(c => c.trim().toUpperCase())
         .filter(c => c.length > 0);
 
       if (validCodes.includes(inputCode)) {
         playSound('magic');
-        // Success animation feel
         setTimeout(() => {
           onActivate();
         }, 800);
@@ -44,9 +42,9 @@ const ActivationModal: React.FC<ActivationModalProps> = ({ onActivate }) => {
         playSound('blip');
         setLoading(false);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError('系统繁忙或文件丢失，请联系管理员。');
+      setError(err.message || '系统繁忙或文件丢失，请联系管理员。');
       setLoading(false);
     }
   };
@@ -54,7 +52,6 @@ const ActivationModal: React.FC<ActivationModalProps> = ({ onActivate }) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-rose-50/80 backdrop-blur-xl">
       <div className="w-full max-w-md bg-white rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500 border border-pink-100 p-8 flex flex-col items-center text-center space-y-8">
-        {/* Animated Icon */}
         <div className="relative">
           <div className="w-24 h-24 bg-gradient-to-tr from-pink-500 to-rose-400 rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-pink-200 animate-bounce">
             <Key className="w-10 h-10 text-white" />
@@ -77,7 +74,7 @@ const ActivationModal: React.FC<ActivationModalProps> = ({ onActivate }) => {
               placeholder="请输入激活码..."
               className={`w-full px-8 py-5 rounded-3xl border-2 transition-all text-center font-black tracking-widest text-lg outline-none ${
                 error 
-                ? 'border-rose-400 bg-rose-50 text-rose-600' 
+                ? 'border-rose-400 bg-rose-50 text-rose-600 animate-shake' 
                 : 'border-pink-50 bg-slate-50 focus:border-pink-500 focus:bg-white text-slate-700'
               }`}
               value={code}

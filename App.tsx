@@ -7,26 +7,24 @@ import {
   Plus, 
   Search,
   Sparkles,
-  Package,
   History,
   Volume2,
   VolumeX
 } from 'lucide-react';
-import { Student, PointRule, ShopItem, PetType, Pet, GrowthRecord } from './types';
-import { INITIAL_STUDENTS, POINT_RULES, SHOP_ITEMS, getPetImage, getStageFromLevel, ABILITIES, playSound } from './constants';
-import StudentCard from './components/StudentCard';
-import PointModal from './components/Modals/PointModal';
-import AdoptionModal from './components/Modals/AdoptionModal';
-import ShopModal from './components/Modals/ShopModal';
-import HonorRollModal from './components/Modals/HonorRollModal';
-import SettingsModal from './components/Modals/SettingsModal';
-import AddStudentModal from './components/Modals/AddStudentModal';
-import StoreManagerModal from './components/Modals/StoreManagerModal';
-import GrowthRecordModal from './components/Modals/GrowthRecordModal';
-import ActivationModal from './components/Modals/ActivationModal';
+import { Student, PointRule, ShopItem, PetType, Pet, GrowthRecord } from './types.ts';
+import { INITIAL_STUDENTS, POINT_RULES, SHOP_ITEMS, getPetImage, getStageFromLevel, ABILITIES, playSound } from './constants.tsx';
+import StudentCard from './components/StudentCard.tsx';
+import PointModal from './components/Modals/PointModal.tsx';
+import AdoptionModal from './components/Modals/AdoptionModal.tsx';
+import ShopModal from './components/Modals/ShopModal.tsx';
+import HonorRollModal from './components/Modals/HonorRollModal.tsx';
+import SettingsModal from './components/Modals/SettingsModal.tsx';
+import AddStudentModal from './components/Modals/AddStudentModal.tsx';
+import StoreManagerModal from './components/Modals/StoreManagerModal.tsx';
+import GrowthRecordModal from './components/Modals/GrowthRecordModal.tsx';
+import ActivationModal from './components/Modals/ActivationModal.tsx';
 
 const App: React.FC = () => {
-  // Persistence Keys
   const STORAGE_KEY_STUDENTS = 'pet_garden_students';
   const STORAGE_KEY_RULES = 'pet_garden_rules';
   const STORAGE_KEY_SHOP = 'pet_garden_shop';
@@ -34,7 +32,6 @@ const App: React.FC = () => {
   const STORAGE_KEY_CONFIG = 'pet_garden_config';
   const STORAGE_KEY_ACTIVATED = 'pet_garden_activated';
 
-  // Load Initial State from Local Storage
   const [isActivated, setIsActivated] = useState<boolean>(() => localStorage.getItem(STORAGE_KEY_ACTIVATED) === 'true');
   const [students, setStudents] = useState<Student[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_STUDENTS);
@@ -62,7 +59,6 @@ const App: React.FC = () => {
   });
   const [soundEnabled, setSoundEnabled] = useState(true);
   
-  // UI States
   const [activeStudentId, setActiveStudentId] = useState<string | null>(null);
   const [showPointModal, setShowPointModal] = useState(false);
   const [showAdoptionModal, setShowAdoptionModal] = useState(false);
@@ -74,7 +70,6 @@ const App: React.FC = () => {
   const [showAddStudentModal, setShowAddStudentModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Sync State to Local Storage
   useEffect(() => localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(students)), [students]);
   useEffect(() => localStorage.setItem(STORAGE_KEY_RULES, JSON.stringify(pointRules)), [pointRules]);
   useEffect(() => localStorage.setItem(STORAGE_KEY_SHOP, JSON.stringify(shopItems)), [shopItems]);
