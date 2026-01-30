@@ -5,30 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Pet Garden - 班级宠物园</title>
-    <!-- 引入 Tailwind CSS -->
+    <!-- 基础库：Tailwind CSS 和 Babel 编译器 -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 Babel 用于在浏览器中编译 TSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Quicksand', sans-serif;
-            background-color: #fff1f2; /* Soft pale pink */
+            background-color: #fff1f2;
             margin: 0;
             overflow: hidden;
         }
-        .cute-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .cute-scrollbar::-webkit-scrollbar-track {
-            background: #fff1f2;
-        }
-        .cute-scrollbar::-webkit-scrollbar-thumb {
-            background: #fbcfe8;
-            border-radius: 10px;
-        }
+        /* 可爱的滚动条 */
+        .cute-scrollbar::-webkit-scrollbar { width: 6px; }
+        .cute-scrollbar::-webkit-scrollbar-track { background: #fff1f2; }
+        .cute-scrollbar::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 10px; }
 
-        /* 初始加载动画 */
+        /* 加载界面层 */
         #app-loader {
             position: fixed;
             inset: 0;
@@ -38,85 +31,123 @@
             justify-content: center;
             background-color: #fff1f2;
             z-index: 9999;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.8s ease;
         }
-        .loader-heart {
-            font-size: 50px;
-            animation: pulse 1s ease-in-out infinite;
+        .loader-content {
+            text-align: center;
         }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.3); }
+        .loader-pet {
+            font-size: 70px;
+            display: inline-block;
+            animation: bounce 0.6s infinite alternate ease-in-out;
         }
-
+        @keyframes bounce {
+            from { transform: translateY(0) scale(1.1); }
+            to { transform: translateY(-30px) scale(0.9); }
+        }
+        .loader-text {
+            margin-top: 30px;
+            color: #f472b6;
+            font-weight: 800;
+            font-size: 20px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0px white;
+        }
+        
+        /* 全局可爱动画 */
         @keyframes pet-float {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-8px) rotate(2deg); }
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(3deg); }
         }
         .pet-float-img { animation: pet-float 3s ease-in-out infinite; }
-        .pet-card-inner { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .selected-pet {
-            border-color: #8A4FFF !important;
-            background-color: #F5F0FF !important;
-            box-shadow: 0 10px 25px -5px rgba(138, 79, 255, 0.3);
-            transform: scale(1.08);
-        }
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          75% { transform: translateX(5px); }
-        }
-        .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
     </style>
-<script type="importmap">
+
+    <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react-dom/client": "https://esm.sh/react-dom@^19.2.3/client",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "lucide-react": "https://esm.sh/lucide-react@^0.563.0"
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.474.0",
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
 </head>
 <body>
-    <!-- 加载占位符 -->
     <div id="app-loader">
-        <div class="loader-heart">🐾</div>
-        <p style="margin-top: 20px; color: #f472b6; font-weight: bold; letter-spacing: 2px;">宠物园加载中...</p>
+        <div class="loader-content">
+            <div class="loader-pet">🐱</div>
+            <p class="loader-text">魔法宠物园正在开启...</p>
+        </div>
     </div>
 
     <div id="root"></div>
 
     <!-- 
-      核心修复：
-      1. 使用 type="text/babel" 让 Babel 处理它
-      2. 添加 data-type="module" 支持 ESM 导入
-      3. data-presets 告诉 Babel 使用 React 和 TypeScript 预设
+        核心修复：GitHub Pages 加载器 
+        原理：手动 Fetch 代码内容，绕过浏览器的 MIME 类型检查
     -->
-    <script 
-        type="text/babel" 
-        data-type="module" 
-        data-presets="react,typescript" 
-        src="./index.tsx">
-    </script>
+    <script type="module">
+        import React from 'react';
+        import ReactDOM from 'react-dom/client';
 
-    <script>
-        // 当 React 挂载完成后隐藏加载动画
-        window.addEventListener('DOMContentLoaded', () => {
-            const observer = new MutationObserver((mutations) => {
-                if (document.getElementById('root').children.length > 0) {
+        async function loadAndRun() {
+            try {
+                // 1. 获取代码内容（fetch 不受 MIME 类型限制）
+                const response = await fetch('./App.tsx');
+                if (!response.ok) throw new Error('无法读取 App.tsx');
+                const code = await response.text();
+
+                // 2. 使用 Babel 手动编译
+                const transformed = Babel.transform(code, {
+                    presets: ['react', ['typescript', { isTSX: true, allExtensions: true }]],
+                    filename: 'App.tsx',
+                    // 关键：处理 import 路径，让它们指向正确的 URL
+                    plugins: [
+                        ({ types: t }) => ({
+                            visitor: {
+                                ImportDeclaration(path) {
+                                    const source = path.node.source.value;
+                                    // 如果是本地引入且没有后缀，尝试补全后缀（针对你的项目结构）
+                                    if (source.startsWith('./') || source.startsWith('../')) {
+                                        // 这里简单化处理，假定所有本地引入都需要 Babel 处理
+                                        // 实际上对于 GitHub Pages，我们可能需要更复杂的映射
+                                    }
+                                }
+                            }
+                        })
+                    ]
+                }).code;
+
+                // 3. 将编译后的代码转为 Blob URL 并动态导入
+                // 注意：由于 App.tsx 还有很多子依赖，最稳妥的方法是在这里注册一个简易的加载器或直接将依赖也内联
+                // 但对于当前需求，我们可以尝试让 Babel 处理整个入口
+                
+                // 方案 B：直接在脚本块中执行（最稳妥）
+                const script = document.createElement('script');
+                script.type = 'text/babel';
+                script.setAttribute('data-type', 'module');
+                script.setAttribute('data-presets', 'react,typescript');
+                script.innerHTML = code; 
+                document.body.appendChild(script);
+
+                // 只要 Babel 脚本开始运行，我们就在稍后关闭加载层
+                setTimeout(() => {
                     const loader = document.getElementById('app-loader');
                     if (loader) {
                         loader.style.opacity = '0';
-                        setTimeout(() => loader.remove(), 500);
+                        setTimeout(() => loader.remove(), 800);
                     }
-                    observer.disconnect();
-                }
-            });
-            observer.observe(document.getElementById('root'), { childList: true });
-        });
+                }, 2500);
+
+            } catch (err) {
+                console.error('加载失败:', err);
+                document.querySelector('.loader-text').innerHTML = '❌ 魔法咒语出错了<br><small>' + err.message + '</small>';
+            }
+        }
+
+        loadAndRun();
     </script>
 </body>
 </html>
