@@ -23,16 +23,46 @@ import SettingsModal from './components/Modals/SettingsModal';
 import AddStudentModal from './components/Modals/AddStudentModal';
 import StoreManagerModal from './components/Modals/StoreManagerModal';
 import GrowthRecordModal from './components/Modals/GrowthRecordModal';
+import ActivationModal from './components/Modals/ActivationModal';
 
 const App: React.FC = () => {
-  const [students, setStudents] = useState<Student[]>(INITIAL_STUDENTS);
-  const [pointRules, setPointRules] = useState<PointRule[]>(POINT_RULES);
-  const [shopItems, setShopItems] = useState<ShopItem[]>(SHOP_ITEMS);
-  const [records, setRecords] = useState<GrowthRecord[]>([]);
-  const [systemName, setSystemName] = useState('班级宠物园');
-  const [className, setClassName] = useState('五年级3班');
+  // Persistence Keys
+  const STORAGE_KEY_STUDENTS = 'pet_garden_students';
+  const STORAGE_KEY_RULES = 'pet_garden_rules';
+  const STORAGE_KEY_SHOP = 'pet_garden_shop';
+  const STORAGE_KEY_RECORDS = 'pet_garden_records';
+  const STORAGE_KEY_CONFIG = 'pet_garden_config';
+  const STORAGE_KEY_ACTIVATED = 'pet_garden_activated';
+
+  // Load Initial State from Local Storage
+  const [isActivated, setIsActivated] = useState<boolean>(() => localStorage.getItem(STORAGE_KEY_ACTIVATED) === 'true');
+  const [students, setStudents] = useState<Student[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_STUDENTS);
+    return saved ? JSON.parse(saved) : INITIAL_STUDENTS;
+  });
+  const [pointRules, setPointRules] = useState<PointRule[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_RULES);
+    return saved ? JSON.parse(saved) : POINT_RULES;
+  });
+  const [shopItems, setShopItems] = useState<ShopItem[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_SHOP);
+    return saved ? JSON.parse(saved) : SHOP_ITEMS;
+  });
+  const [records, setRecords] = useState<GrowthRecord[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_RECORDS);
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [systemName, setSystemName] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_CONFIG);
+    return saved ? JSON.parse(saved).systemName : '班级宠物园';
+  });
+  const [className, setClassName] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_CONFIG);
+    return saved ? JSON.parse(saved).className : '五年级3班';
+  });
   const [soundEnabled, setSoundEnabled] = useState(true);
   
+  // UI States
   const [activeStudentId, setActiveStudentId] = useState<string | null>(null);
   const [showPointModal, setShowPointModal] = useState(false);
   const [showAdoptionModal, setShowAdoptionModal] = useState(false);
@@ -43,6 +73,18 @@ const App: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showAddStudentModal, setShowAddStudentModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Sync State to Local Storage
+  useEffect(() => localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(students)), [students]);
+  useEffect(() => localStorage.setItem(STORAGE_KEY_RULES, JSON.stringify(pointRules)), [pointRules]);
+  useEffect(() => localStorage.setItem(STORAGE_KEY_SHOP, JSON.stringify(shopItems)), [shopItems]);
+  useEffect(() => localStorage.setItem(STORAGE_KEY_RECORDS, JSON.stringify(records)), [records]);
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify({ systemName, className }));
+  }, [systemName, className]);
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_ACTIVATED, isActivated.toString());
+  }, [isActivated]);
 
   const triggerSound = (type: 'pop' | 'magic' | 'levelUp' | 'blip') => {
     if (soundEnabled) playSound(type);
@@ -163,6 +205,10 @@ const App: React.FC = () => {
     
     setShopItems(prev => prev.map(i => i.id === itemId ? { ...i, stock: Math.max(0, i.stock - 1) } : i));
   };
+
+  if (!isActivated) {
+    return <ActivationModal onActivate={() => setIsActivated(true)} />;
+  }
 
   return (
     <div className="flex flex-col h-screen bg-rose-50 text-slate-800 transition-colors duration-500">

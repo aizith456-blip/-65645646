@@ -129,7 +129,6 @@ export const getStageFromLevel = (level: number): GrowthStage => {
   return GrowthStage.ADULT;
 };
 
-// Simplified image logic: keeps the user's selected breed image
 export const getPetImage = (baseImage: string, level: number): string => {
   return baseImage; 
 };
